@@ -9,8 +9,8 @@
             <span>SmartPOS</span>
         </div>
         <ul class="nav-menu" id="navMenu">
-            <li><a href="index.html" class="nav-link active">Home</a></li>
-            <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="{{ route('home') }}" class="nav-link{{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
+            <li><a href="{{ route('about') }}" class="nav-link{{ request()->routeIs('about') ? 'active' : '' }}">About</a></li>
             <li><a href="pricing.html" class="nav-link">Pricing</a></li>
             <li><a href="contact.html" class="nav-link">Contact</a></li>
             <li><a href="login.html" class="nav-link">Login</a></li>

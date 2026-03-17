@@ -1616,7 +1616,7 @@ table th:first-child {
 .pos-screen {
   position: absolute;
   top: 10px;
-  left: 10px;
+  left: 20px;
   width: 80%;
   height: 40px;
   background: #2563eb;

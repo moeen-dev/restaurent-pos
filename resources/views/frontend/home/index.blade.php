@@ -1,6 +1,9 @@
 @extends('frontend.app')
 @section('title', 'Home')
 @section('content')
+
+{{-- preloader --}}
+@include('frontend.partials.preloader')
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero-content">
@@ -136,16 +139,6 @@
                 <button class="btn btn-outline" onclick="window.location.href='pricing.html'">Learn More</button>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta">
-    <div class="section-container">
-        <h2>Ready to Transform Your Restaurant?</h2>
-        <p>Join hundreds of restaurants already using SmartPOS</p>
-        <button class="btn btn-primary btn-lg" onclick="window.location.href='register.html'">Start Free
-            Trial</button>
     </div>
 </section>
 @endsection

@@ -366,13 +366,21 @@ window.addEventListener("resize", handleResponsive);
 // ==================== PAGE LOAD ANIMATIONS ====================
 
 // Hide preloader after animation
-const card = document.querySelector(".card");
-card.addEventListener("animationend", () => {
-  const preloader = document.getElementById("preloader");
-  preloader.style.transition = "opacity 0.5s";
-  preloader.style.opacity = "0";
-  setTimeout(() => {
-    preloader.style.display = "none";
-    document.getElementById("main-content").style.display = "block";
-  }, 500);
+document.addEventListener("DOMContentLoaded", () => {
+    const card = document.querySelector(".card");
+    if (!card) return; // safety check
+
+    card.addEventListener("animationend", () => {
+        const preloader = document.getElementById("preloader");
+        if (!preloader) return;
+
+        preloader.style.transition = "opacity 0.5s";
+        preloader.style.opacity = "0";
+
+        setTimeout(() => {
+            preloader.style.display = "none";
+            const mainContent = document.getElementById("main-content");
+            if (mainContent) mainContent.style.display = "block";
+        }, 500);
+    });
 });
