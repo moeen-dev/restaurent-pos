@@ -13,8 +13,7 @@
             <li><a href="{{ route('about') }}" class="nav-link{{ request()->routeIs('about') ? 'active' : '' }}">About</a></li>
             <li><a href="{{ route('pricing') }}" class="nav-link{{ request()->routeIs('pricing') ? 'active' : '' }}">Pricing</a></li>
             <li><a href="{{ route('contact') }}" class="nav-link{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a></li>
-            <li><a href="login.html" class="nav-link">Login</a></li>
-            <li><a href="register.html" class="nav-link nav-register">Register</a></li>
+            <li><a href="{{ route('login') }}" class="nav-link nav-register">Login</a></li>
         </ul>
         <div class="hamburger" id="hamburger">
             <span class="hamburger-line"></span>

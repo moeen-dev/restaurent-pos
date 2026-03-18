@@ -1355,7 +1355,7 @@ table th:first-child {
 
 @media (max-width: 768px) {
   .nav-menu {
-    gap: 20px;
+    gap: 30px;
   }
 
   .section-title {
@@ -1434,14 +1434,13 @@ table th:first-child {
     background: white;
     flex-direction: column;
     display: flex;
-    gap: 0;
     padding: 20px;
     box-shadow: var(--shadow);
     border-bottom: 1px solid var(--border);
   }
 
   .nav-link {
-    padding: 12px 0;
+    padding: 10px 15px;
     border-bottom: 1px solid var(--border);
   }
 
