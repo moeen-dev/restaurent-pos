@@ -11,7 +11,7 @@
         <ul class="nav-menu" id="navMenu">
             <li><a href="{{ route('home') }}" class="nav-link{{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
             <li><a href="{{ route('about') }}" class="nav-link{{ request()->routeIs('about') ? 'active' : '' }}">About</a></li>
-            <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+            <li><a href="{{ route('pricing') }}" class="nav-link{{ request()->routeIs('pricing') ? 'active' : '' }}">Pricing</a></li>
             <li><a href="contact.html" class="nav-link">Contact</a></li>
             <li><a href="login.html" class="nav-link">Login</a></li>
             <li><a href="register.html" class="nav-link nav-register">Register</a></li>
