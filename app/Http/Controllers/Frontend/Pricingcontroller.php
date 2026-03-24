@@ -9,6 +9,6 @@ class Pricingcontroller extends Controller
 {
     public function pricing()
     {
-        return view('frontend.pricing.index');
+        return view('frontend.layouts.pricing.index');
     }
 }

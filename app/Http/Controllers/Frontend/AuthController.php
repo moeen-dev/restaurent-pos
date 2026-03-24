@@ -9,11 +9,11 @@ class AuthController extends Controller
 {
     public function register()
     {
-        return view('frontend.auth.register');
+        return view('frontend.layouts.auth.register');
     }
 
     public function login()
     {
-        return view('frontend.auth.login');
+        return view('frontend.layouts.auth.login');
     }   
 }
