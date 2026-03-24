@@ -16,5 +16,5 @@ Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['prefix' => 'admin'], function () {
-    Route::get('/', [BackendHomeController::class, 'index'])->name('admin.home');
+    Route::get('/dashboard', [BackendHomeController::class, 'index'])->name('admin.home');
 });
