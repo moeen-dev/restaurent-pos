@@ -12,10 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            // $table->foreignId('restaurant_id')
-            //     ->nullable()
-            //     ->constrained()
-            //     ->onDelete('cascade');
             $table->unsignedBigInteger('restaurant_id')->nullable();
 
             $table->string('name');
@@ -24,11 +20,11 @@ return new class extends Migration
             $table->string('password');
 
             $table->enum('role', [
-                'SuperAdmin',
-                'Admin',
-                'Manager',
-                'Cashier'
-            ])->default('Cashier');
+                'super_admin',
+                'admin',
+                'manager',
+                'cashier'
+            ])->default('cashier');
 
             $table->rememberToken();
             $table->timestamps();
