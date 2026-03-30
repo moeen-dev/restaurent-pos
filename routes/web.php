@@ -13,8 +13,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'about'])->name('about');
 Route::get('/pricing', [Pricingcontroller::class, 'pricing'])->name('pricing');
 Route::get('/contact', [ContactController::class, 'contact'])->name('contact');
+
+// Authentication routes
 Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register', [AuthController::class, 'registerSubmit'])->name('register.submit');
 Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'loginSubmit'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 Route::group(['prefix' => 'admin'], function () {
     // Admin routes

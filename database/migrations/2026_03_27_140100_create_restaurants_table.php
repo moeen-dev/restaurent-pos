@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('restaurants', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->string('slug');
-            $table->string('phn_num');
+            $table->string('phone', 20);
             $table->string('address');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

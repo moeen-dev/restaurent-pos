@@ -55,7 +55,9 @@ h6 {
 }
 
 /* ==================== CONTAINER & LAYOUT ==================== */
-
+.required {
+  color: red;
+}
 .section-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -991,7 +993,7 @@ table th:first-child {
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.08),
     0 0 1px rgba(0, 0, 0, 0.1);
-  max-width: 420px;
+  max-width: 500px;
   width: 100%;
   animation: slideUp 0.5s ease-out;
 }

@@ -49,4 +49,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function restaurants()
+    {
+        return $this->belongsToMany(Restaurant::class)->withPivot('role');
+    }
+
+    public function ownedRestaurants()
+    {
+        return $this->hasMany(Restaurant::class, 'owner_id');
+    }
 }

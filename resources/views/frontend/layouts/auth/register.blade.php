@@ -6,7 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account - SmartPOS</title>
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.1/build/css/intlTelInput.min.css">
+
+    <style>
+        .iti {
+            width: 100%;
+        }
+
+        .iti input {
+            width: 100% !important;
+            padding-left: 90px !important;
+            /* space for +880 */
+            box-sizing: border-box;
+        }
+    </style>
 </head>
+
+
 
 <body class="auth-page">
     <!-- Top Navigation -->
@@ -33,9 +49,22 @@
             </div>
 
             <!-- Form -->
-            <form id="registerForm" class="auth-form">
+            <form id="registerForm" method="POST" action="{{ route('register.submit') }}" class="auth-form">
+                @csrf
                 <div class="form-group">
-                    <label for="name">Full Name</label>
+                    <label for="restaurant_name">Full Name of Restaurant <span class="required">*</span> </label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10.5z"
+                                stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <input type="text" id="restaurant_name" name="restaurant_name" placeholder="Restaurant Name"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurant_owner_name">Restaurant Owner Name <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M20 21V19C20 17.9 19.1 17 18 17H6C4.9 17 4 17.9 4 19V21" stroke="#64748B"
@@ -43,7 +72,19 @@
                             <circle cx="12" cy="7" r="4" stroke="#64748B" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        <input type="text" id="name" name="name" placeholder="John Doe" required>
+                        <input type="text" id="name" name="name" placeholder="Owner Name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurant_address">Restaurant Address <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 21s7-5.5 7-12a7 7 0 1 0-14 0c0 6.5 7 12 7 12z" stroke="#64748B"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="12" cy="9" r="2.5" stroke="#64748B" stroke-width="2" />
+                        </svg>
+                        <input type="text" id="address" name="address" placeholder="Restaurant Address" required>
                     </div>
                 </div>
 
@@ -57,7 +98,16 @@
                             <path d="M22 6L12 13L2 6" stroke="#64748B" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                        <input type="email" id="email" name="email" placeholder="Email Address" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+
+                    <div class="input-wrapper">
+                        <input type="tel" id="phone" name="phone" required>
+                        <input type="hidden" name="phone_full" id="phone_full">
                     </div>
                 </div>
 
@@ -92,7 +142,7 @@
                                 stroke="#64748B" stroke-width="1.5" />
                             <circle cx="12" cy="8" r="2" fill="#64748B" />
                         </svg>
-                        <input type="password" id="confirm-password" name="confirm-password"
+                        <input type="password" id="password_confirmation" name="password_confirmation"
                             placeholder="Confirm your password" required>
                         <button type="button" class="toggle-password" id="togglePassword2" title="Show password">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -129,6 +179,25 @@
             <p>© 2024 SmartPOS. All rights reserved.</p>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.1/build/js/intlTelInput.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    
+        const input = document.querySelector("#phone");
+    
+        const iti = window.intlTelInput(input, {
+            initialCountry: "bd",
+            separateDialCode: true
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function () {
+            document.getElementById('phone_full').value =
+            document.getElementById('phone').value;
+        });
+    
+    });
+    </script>
 
     <script src="{{ asset('assets/frontend/js/script.js') }}"></script>
 </body>

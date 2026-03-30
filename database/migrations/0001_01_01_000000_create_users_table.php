@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             // Only platform admin role
-            $table->enum('role', ['super_admin', 'manager', 'moderator'])->default('moderator');
+            $table->enum('role', ['super_admin', 'admin', 'restaurant_owner'])->default('restaurant_owner');
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();

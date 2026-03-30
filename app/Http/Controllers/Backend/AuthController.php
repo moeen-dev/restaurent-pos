@@ -44,6 +44,7 @@ class AuthController extends Controller
     // Login processing method
     public function loginSubmit(Request $request)
     {
+        // Validate input
         $validated = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
