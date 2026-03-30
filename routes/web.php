@@ -26,6 +26,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/login-processing', [BackendAuthController::class, 'loginSubmit'])->name('admin.login.submit');
     Route::post('/logout', [BackendAuthController::class, 'logout'])->name('admin.logout');
 
+    // Protected routes for super_admin role
     Route::middleware(['auth', 'role:super_admin'])->group(function () {
         // Protected admin routes
         Route::get('/dashboard', [BackendHomeController::class, 'index'])->name('admin.home');
