@@ -12,7 +12,7 @@ class RestaurantUser extends Model
         'role',
     ];
 
-    public function restaurant()
+    public function restaurants()
     {
         return $this->belongsTo(Restaurant::class);
     }

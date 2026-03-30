@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+use function Flasher\Prime\flash;
+
 class AuthController extends Controller
 {
     public function register()
@@ -79,5 +81,59 @@ class AuthController extends Controller
     public function login()
     {
         return view('frontend.layouts.auth.login');
+    }
+
+    public function loginSubmit(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+
+            $user = Auth::user();
+
+            $restaurant = $user->restaurants()->first();
+
+            if (!$restaurant) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'No restaurant found for this account.'
+                ]);
+            }
+
+            $role = $restaurant->pivot->role;
+
+            session([
+                'restaurant_id' => $restaurant->id,
+                'role' => $role
+            ]);
+
+            $message = match ($role) {
+                'owner' => 'Welcome, You are login as a Owner!',
+                'manager' => 'Welcome, You are login as a Manager!',
+                'staff' => 'Welcome, You are login as a Staff!',
+                default => 'Login successful!'
+            };
+
+            return redirect()->route('resto.home')
+                ->with('success', $message);
+        }
+
+        flash()->error('Login failed: Invalid email or password.');
+        return back();
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        flash()->success('You have been logged out successfully.');
+        return redirect()->route('home');
     }
 }

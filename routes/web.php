@@ -1,13 +1,18 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+// Backend Controllers
 use App\Http\Controllers\Backend\AuthController as BackendAuthController;
 use App\Http\Controllers\Backend\HomeController as BackendHomeController;
+// Frontend Controllers
 use App\Http\Controllers\Frontend\AboutController;
 use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\Pricingcontroller;
-use Illuminate\Support\Facades\Route;
+// Restaurant Controllers
+use App\Http\Controllers\Resto\HomeController as RestoHomeController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'about'])->name('about');
@@ -20,6 +25,17 @@ Route::post('/register', [AuthController::class, 'registerSubmit'])->name('regis
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'loginSubmit'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::group(['prefix' => 'restaurant'], function () {
+    Route::get('/', function () {
+        return redirect()->route('login');
+    });
+
+    Route::middleware(['auth', 'restaurant:owner'])->group(function () {
+        // Protected restaurant routes
+        Route::get('/dashboard', [RestoHomeController::class, 'index'])->name('resto.home');
+    });
+});
 
 
 Route::group(['prefix' => 'admin'], function () {

@@ -33,7 +33,8 @@
             </div>
 
             <!-- Form -->
-            <form id="loginForm" class="auth-form">
+            <form id="loginForm" method="POST" action="{{ route('login.submit') }}" class="auth-form">
+                @csrf
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <div class="input-wrapper">
