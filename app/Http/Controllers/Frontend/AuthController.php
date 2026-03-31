@@ -134,8 +134,8 @@ class AuthController extends Controller
 
             Log::error('Login error', [
                 'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'email' => $request->input('email'),
+                'ip' => $request->ip(),
             ]);
 
             flash()->error('Login failed: ' . $e->getMessage());

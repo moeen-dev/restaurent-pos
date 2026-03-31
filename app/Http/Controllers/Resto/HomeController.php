@@ -9,6 +9,6 @@ class HomeController extends Controller
 {
     public function ownerIndex()
     {
-        return view('resto.resto');
+        return view('resto.layouts.home.index');
     }
 }
