@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 use function Flasher\Prime\flash;
@@ -85,24 +86,26 @@ class AuthController extends Controller
 
     public function loginSubmit(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
 
-        $credentials = $request->only('email', 'password');
+            if (!Auth::attempt($request->only('email', 'password'))) {
 
-        if (Auth::attempt($credentials)) {
+                flash()->error('Invalid email or password.');
+                return back()->withInput();
+            }
 
             $user = Auth::user();
-
             $restaurant = $user->restaurants()->first();
 
             if (!$restaurant) {
+
                 Auth::logout();
-                return back()->withErrors([
-                    'email' => 'No restaurant found for this account.'
-                ]);
+                flash()->error('No restaurant found for your account.');
+                return redirect()->route('login');
             }
 
             $role = $restaurant->pivot->role;
@@ -112,19 +115,32 @@ class AuthController extends Controller
                 'role' => $role
             ]);
 
+            // Check role properly
+            if (!in_array($role, ['owner', 'manager', 'staff'])) {
+                Auth::logout();
+                flash()->error('Access denied for your role.');
+                return redirect()->route('login');
+            }
+
             $message = match ($role) {
-                'owner' => 'Welcome, You are login as a Owner!',
-                'manager' => 'Welcome, You are login as a Manager!',
-                'staff' => 'Welcome, You are login as a Staff!',
-                default => 'Login successful!'
+                'owner' => redirect()->route('owner.dashboard')->with('success', 'Welcome, Login as an Owner!'),
+                'manager' => redirect()->route('manager.dashboard')->with('success', 'Welcome, Login as a Manager!'),
+                'staff' => redirect()->route('staff.dashboard')->with('success', 'Welcome, Login as a Staff!'),
+                default => redirect()->route('login')->with('error', 'Login successful!')
             };
 
-            return redirect()->route('resto.home')
-                ->with('success', $message);
-        }
+            return $message;
+        } catch (\Exception $e) {
 
-        flash()->error('Login failed: Invalid email or password.');
-        return back();
+            Log::error('Login error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            flash()->error('Login failed: ' . $e->getMessage());
+            return back()->withInput();
+        }
     }
 
     public function logout(Request $request)
@@ -134,6 +150,6 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         flash()->success('You have been logged out successfully.');
-        return redirect()->route('home');
+        return redirect()->route('login');
     }
 }

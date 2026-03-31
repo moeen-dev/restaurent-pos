@@ -30,7 +30,8 @@ class RestaurantMiddleware
 
         if (!$restaurant) {
             Auth::logout();
-            return redirect()->route('login')->with('error', 'No restaurant found.');
+            flash()->error('No restaurant found for your account.');
+            return redirect()->route('login');
         }
 
         $role = $restaurant->pivot->role;
@@ -42,9 +43,8 @@ class RestaurantMiddleware
         ]);
 
         // ✅ FIX: Check role properly
-        if (!empty($roles) && !in_array($role, $roles)) {
-            return redirect()->route('home')
-                ->with('error', 'Access denied');
+        if (!in_array($role, $roles)) {
+            abort(403, 'Unauthorized');
         }
 
         return $next($request);
