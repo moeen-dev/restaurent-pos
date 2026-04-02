@@ -11,6 +11,7 @@ use App\Http\Controllers\Frontend\AuthController as FrontendAuthController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\Pricingcontroller;
+use App\Http\Controllers\Resto\CategoryController;
 // Restaurant Controllers
 use App\Http\Controllers\Resto\HomeController as RestoHomeController;
 
@@ -20,8 +21,15 @@ Route::get('/pricing', [Pricingcontroller::class, 'pricing'])->name('pricing');
 Route::get('/contact', [ContactController::class, 'contact'])->name('contact');
 
 // Authentication routes
+// Registration routes
 Route::get('/register', [FrontendAuthController::class, 'register'])->name('register');
 Route::post('/register', [FrontendAuthController::class, 'registerSubmit'])->name('register.submit');
+
+// OTP verification routes
+Route::get('/register/otp', [FrontendAuthController::class, 'showOtpForm'])->name('register.otp');
+Route::post('/register/otp', [FrontendAuthController::class, 'verifyOtp'])->name('register.otp.verify');
+
+// Login and logout routes
 Route::get('/login', [FrontendAuthController::class, 'login'])->name('login');
 Route::post('/login', [FrontendAuthController::class, 'loginSubmit'])->name('login.submit');
 Route::post('/logout', [FrontendAuthController::class, 'logout'])->name('logout');
@@ -41,6 +49,7 @@ Route::group(['prefix' => 'restaurant'], function () {
     Route::middleware(['auth', 'restaurant:manager'])->group(function () {
         // Protected restaurant routes
         // Route::get('manager/dashboard', [RestoHomeController::class, 'managerIndex'])->name('manager.dashboard');
+        Route::get('category', [CategoryController::class, 'index'])->name('category.index');
     });
 
     // Protected routes for staff role

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendOtpMail;
 use App\Models\Restaurant;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 use function Flasher\Prime\flash;
@@ -34,28 +36,78 @@ class AuthController extends Controller
             'terms' => 'accepted',
         ]);
 
-        try {
-            [$user, $restaurant] = DB::transaction(function () use ($validatedData) {
+        // Generate 6 digit oto
+        $otp = random_int(100000, 999999);
 
-                // CREATE OWNER USER
+        // Store data in session
+        session([
+            'register_data' => $validatedData,
+            'register_otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(5) // OTP valid for 5 minutes
+        ]);
+
+        // Send OTP to user's email
+        Mail::to($validatedData['email'])->send(new SendOtpMail($otp, $validatedData['name']));
+
+        flash()->success('An OTP has been sent to your email. Please verify to complete registration.');
+        return redirect()->route('register.otp');
+    }
+
+    public function showOtpForm()
+    {
+        // Optional: prevent direct access without session
+        if (!session('register_data')) {
+            return redirect()->route('register');
+        }
+
+        return view('frontend.layouts.auth.verify-otp'); // create this view
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|digits:6'
+        ]);
+
+        if (!session('register_otp')) {
+            return redirect()->route('register')->withErrors('Session expired');
+        }
+
+        if (now()->gt(session('otp_expires_at'))) {
+            return back()->withErrors('OTP expired');
+        }
+
+        if ($request->otp != session('register_otp')) {
+            return back()->withErrors('Invalid OTP');
+        }
+
+        // OTP verified → proceed to save
+        return $this->completeRegistration();
+    }
+
+    private function completeRegistration()
+    {
+        $data = session('register_data');
+
+        try {
+            [$user, $restaurant] = DB::transaction(function () use ($data) {
+
                 $user = User::create([
-                    'name' => $validatedData['name'],
-                    'email' => $validatedData['email'],
+                    'name' => $data['name'],
+                    'email' => $data['email'],
                     'email_verified_at' => now(),
-                    'password' => Hash::make($validatedData['password']),
+                    'password' => Hash::make($data['password']),
                     'role' => 'restaurant_owner'
                 ]);
 
-                // 2. CREATE RESTAURANT
                 $restaurant = Restaurant::create([
                     'owner_id' => $user->id,
-                    'name' => $validatedData['restaurant_name'],
-                    'slug' => Str::slug($validatedData['restaurant_name']),
-                    'phone' => $validatedData['phone_full'],
-                    'address' => $validatedData['address'],
+                    'name' => $data['restaurant_name'],
+                    'slug' => Str::slug($data['restaurant_name']),
+                    'phone' => $data['phone_full'],
+                    'address' => $data['address'],
                 ]);
 
-                // 3. ATTACH OWNER
                 $restaurant->users()->attach($user->id, [
                     'role' => 'owner'
                 ]);
@@ -63,19 +115,20 @@ class AuthController extends Controller
                 return [$user, $restaurant];
             });
 
-            // 4. LOGIN AUTO
             Auth::login($user);
-
-            // 5. SET SESSION
             session(['restaurant_id' => $restaurant->id]);
 
-            flash()->success('Registration successful! You are now logged in.');
-            return redirect()->route('home');
+            // Clear temp session
+            session()->forget([
+                'register_data',
+                'register_otp',
+                'otp_expires_at'
+            ]);
+
+            flash()->success('Registration successful!');
+            return redirect()->route('login');
         } catch (\Exception $e) {
-
-            flash()->error('Registration failed: ' . $e->getMessage());
-
-            return back()->withInput();
+            return redirect()->route('register')->withErrors($e->getMessage());
         }
     }
 
