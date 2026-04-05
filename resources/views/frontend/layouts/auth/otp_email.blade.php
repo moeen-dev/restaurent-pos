@@ -48,7 +48,7 @@
             <div style="
             margin: 0;
             margin-top: 70px;
-            padding: 92px 30px 115px;
+            padding: 90px 30px 90px;
             background: #ffffff;
             border-radius: 30px;
             text-align: center;
@@ -102,13 +102,13 @@
             margin-top: 40px;
             text-align: center;
             font-weight: 500;
-            color: #8c8c8c;
+            color: #ffffff;
           ">
                 Need help? Ask at
                 <a href="mailto:{{ config('mail.from.address') }}" target="_blank"
-                    style="color: #499fb6; text-decoration: none;">moeen.contact.me@gmail.com</a>
+                    style="color: #ffffff; text-decoration: none;">moeen.contact.me@gmail.com</a>
                 or visit our
-                <a href="" target="_blank" style="color: #499fb6; text-decoration: none;">Help Center</a>
+                <a href="" target="_blank" style="color: #ffffff; text-decoration: none;">Help Center</a>
             </p>
         </main>
 
@@ -124,15 +124,15 @@
             margin-top: 40px;
             font-size: 16px;
             font-weight: 600;
-            color: #434343;
+            color: #ffffff;
           ">
-                Archisketch Company
+                {{ $appname }}
             </p>
-            <p style="margin: 0; margin-top: 8px; color: #434343;">
-                Address 540, City, State.
+            <p style="margin: 0; margin-top: 8px; color: #ffffff;">
+                Dhaka, Bangladesh.
             </p>
-            <p style="margin: 0; margin-top: 16px; color: #434343;">
-                Copyright © <?php echo date('Y') ?> Company. All rights reserved.
+            <p style="margin: 0; margin-top: 16px; color: #ffffff;">
+                Copyright © <?php echo date('Y') ?> {{ $appname }}. All rights reserved.
             </p>
         </footer>
     </div>

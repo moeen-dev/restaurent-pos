@@ -26,15 +26,29 @@ class AuthController extends Controller
     public function registerSubmit(Request $request)
     {
         // Handle registration logic here
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'restaurant_name' => 'required|string|max:255',
-            'phone_full' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'terms' => 'accepted',
-        ]);
+        $validatedData = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:6',
+                'restaurant_name' => 'required|string|max:255',
+                'phone_full' => 'required|string|unique:restaurants,phone',
+                'address' => 'required|string|max:255',
+                'terms' => 'accepted',
+            ],
+            [
+                'name.required' => 'Name is required.',
+                'email.required' => 'Email is required.',
+                'email.email' => 'Please enter a valid email address.',
+                'email.unique' => 'This email is already registered.',
+                'password.required' => 'Password is required.',
+                'password.min' => 'Password must be at least 6 characters.',
+                'restaurant_name.required' => 'Restaurant name is required.',
+                'phone_full.required' => "Phone Number is required.",
+                'address.required' => "Address is required.",
+                'terms.accepted' => 'You must accept the terms and conditions.'
+            ]
+        );
 
         // Generate 6 digit oto
         $otp = random_int(100000, 999999);
@@ -65,20 +79,30 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request)
     {
-        $request->validate([
-            'otp' => 'required|digits:6'
-        ]);
+        $request->validate(
+            [
+                'otp' => 'required|digits:6|numeric'
+            ],
+            [
+                'otp.required' => 'OTP is required.',
+                'otp.digits' => 'OTP must be exactly 6 digits.',
+                'otp.numeric' => 'OTP must be a number.'
+            ]
+        );
 
         if (!session('register_otp')) {
-            return redirect()->route('register')->withErrors('Session expired');
+            flash()->error('Session expired.');
+            return back();
         }
 
         if (now()->gt(session('otp_expires_at'))) {
-            return back()->withErrors('OTP expired');
+            flash()->error('OTP has expired. Please register again.');
+            return back();
         }
 
         if ($request->otp != session('register_otp')) {
-            return back()->withErrors('Invalid OTP');
+            flash()->error('Invalid OTP. Please try again.');
+            return back();
         }
 
         // OTP verified → proceed to save

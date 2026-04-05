@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
-            $table->string('slug');
-            $table->string('phone', 20);
+            $table->string('slug')->unique();
+            $table->string('phone', 20)->unique();
             $table->string('address');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

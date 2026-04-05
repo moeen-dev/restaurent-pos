@@ -36,7 +36,7 @@
             <form id="loginForm" method="POST" action="{{ route('login.submit') }}" class="auth-form">
                 @csrf
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+                    <label for="email">Email Address <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path
@@ -46,11 +46,14 @@
                                 stroke-linejoin="round" />
                         </svg>
                         <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                        @error('email')
+                        <p class="required">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">Password <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M12 1C6.48 1 2 5.48 2 11V21H4V15H20V21H22V11C22 5.48 17.52 1 12 1Z" fill="none"
@@ -58,6 +61,9 @@
                             <circle cx="12" cy="8" r="2" fill="#64748B" />
                         </svg>
                         <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        @error('password')
+                        <p class="required">{{ $message }}</p>
+                        @enderror
                         <button type="button" class="toggle-password" id="togglePassword" title="Show password">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path

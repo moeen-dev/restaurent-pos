@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account - SmartPOS</title>
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/style.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.1/build/css/intlTelInput.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.2/build/css/intlTelInput.css">
 
     <style>
         .iti {
@@ -60,6 +60,9 @@
                         </svg>
                         <input type="text" id="restaurant_name" name="restaurant_name" placeholder="Restaurant Name"
                             required>
+                        @if($errors->has('restaurant_name'))
+                        <small class="required">{{ $errors->first('restaurant_name') }}</small>
+                        @endif
                     </div>
                 </div>
 
@@ -73,6 +76,9 @@
                                 stroke-linejoin="round" />
                         </svg>
                         <input type="text" id="name" name="name" placeholder="Owner Name" required>
+                        @if($errors->has('name'))
+                        <small class="required">{{ $errors->first('name') }}</small>
+                        @endif
                     </div>
                 </div>
 
@@ -85,11 +91,14 @@
                             <circle cx="12" cy="9" r="2.5" stroke="#64748B" stroke-width="2" />
                         </svg>
                         <input type="text" id="address" name="address" placeholder="Restaurant Address" required>
+                        @if($errors->has('address'))
+                        <small class="required">{{ $errors->first('address') }}</small>
+                        @endif
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+                    <label for="email">Email Address <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path
@@ -99,20 +108,26 @@
                                 stroke-linejoin="round" />
                         </svg>
                         <input type="email" id="email" name="email" placeholder="Email Address" required>
+                        @if($errors->has('email'))
+                        <small class="required">{{ $errors->first('email') }}</small>
+                        @endif
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">Phone Number</label>
+                    <label for="phone">Phone Number <span class="required">*</span></label>
 
                     <div class="input-wrapper">
                         <input type="tel" id="phone" name="phone" required>
-                        <input type="hidden" name="phone_full" id="phone_full">
+                        <input type="hidden" id="phone_full" name="phone_full">
                     </div>
+                    @if($errors->has('phone_full'))
+                    <small class="required">{{ $errors->first('phone_full') }}</small>
+                    @endif
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">Password <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M12 1C6.48 1 2 5.48 2 11V21H4V15H20V21H22V11C22 5.48 17.52 1 12 1Z" fill="none"
@@ -121,6 +136,9 @@
                         </svg>
                         <input type="password" id="password" name="password" placeholder="At least 8 characters"
                             required>
+                        @if($errors->has('password'))
+                        <small class="required">{{ $errors->first('password') }}</small>
+                        @endif
                         <button type="button" class="toggle-password" id="togglePassword1" title="Show password">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path
@@ -131,11 +149,10 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="password-strength" id="passwordStrength"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
+                    <label for="confirm-password">Confirm Password <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M12 1C6.48 1 2 5.48 2 11V21H4V15H20V21H22V11C22 5.48 17.52 1 12 1Z" fill="none"
@@ -144,6 +161,9 @@
                         </svg>
                         <input type="password" id="password_confirmation" name="password_confirmation"
                             placeholder="Confirm your password" required>
+                        @if($errors->has('password_confirmation'))
+                        <small class="required">{{ $errors->first('password_confirmation') }}</small>
+                        @endif
                         <button type="button" class="toggle-password" id="togglePassword2" title="Show password">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path
@@ -180,23 +200,23 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.1/build/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.2/build/js/intlTelInput.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-    
         const input = document.querySelector("#phone");
     
         const iti = window.intlTelInput(input, {
             initialCountry: "bd",
-            separateDialCode: true
-        });
-
-        document.getElementById('registerForm').addEventListener('submit', function () {
-            document.getElementById('phone_full').value =
-            document.getElementById('phone').value;
+            separateDialCode: true,
+            loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@26.9.2/build/js/utils.js"),
         });
     
-    });
+        const form = document.querySelector("#registerForm");
+    
+        form.addEventListener("submit", function (e) {
+            const fullNumber = iti.getNumber(); 
+    
+            document.querySelector("#phone_full").value = fullNumber;
+        });
     </script>
 
     <script src="{{ asset('assets/frontend/js/script.js') }}"></script>
