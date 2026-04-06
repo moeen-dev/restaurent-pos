@@ -26,8 +26,11 @@ Route::get('/register', [FrontendAuthController::class, 'register'])->name('regi
 Route::post('/register', [FrontendAuthController::class, 'registerSubmit'])->name('register.submit');
 
 // OTP verification routes
-Route::get('/register/otp', [FrontendAuthController::class, 'showOtpForm'])->name('register.otp');
-Route::post('/register/otp', [FrontendAuthController::class, 'verifyOtp'])->name('register.otp.verify');
+Route::get('/register/verify-otp', [FrontendAuthController::class, 'showOtpForm'])->name('register.otp');
+Route::post('/register/verify-otp', [FrontendAuthController::class, 'verifyOtp'])->name('register.otp.verify');
+
+// 
+Route::post('/resend/otp', [FrontendAuthController::class, 'resendOtp'])->name('register.otp.resend');
 
 // Login and logout routes
 Route::get('/login', [FrontendAuthController::class, 'login'])->name('login');

@@ -32,7 +32,7 @@ class AuthController extends Controller
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
                 'restaurant_name' => 'required|string|max:255',
-                'phone_full' => 'required|string|unique:restaurants,phone',
+                'phone_full' => 'required|string|max:16|unique:restaurants,phone',
                 'address' => 'required|string|max:255',
                 'terms' => 'accepted',
             ],
@@ -57,7 +57,7 @@ class AuthController extends Controller
         session([
             'register_data' => $validatedData,
             'register_otp' => $otp,
-            'otp_expires_at' => now()->addMinutes(5) // OTP valid for 5 minutes
+            'otp_expires_at' => now()->addMinutes(5)->timestamp // OTP valid for 5 minutes
         ]);
 
         // Send OTP to user's email
@@ -95,7 +95,14 @@ class AuthController extends Controller
             return back();
         }
 
-        if (now()->gt(session('otp_expires_at'))) {
+        if (now()->timestamp > session('otp_expires_at')) {
+
+            session([
+                'otp_expired' => true,
+                'otp_expires_at' => null,
+                'register_otp' => null
+            ]);
+
             flash()->error('OTP has expired. Please register again.');
             return back();
         }
@@ -107,6 +114,28 @@ class AuthController extends Controller
 
         // OTP verified → proceed to save
         return $this->completeRegistration();
+    }
+
+    public function resendOtp()
+    {
+        if (!session('register_data')) {
+            flash()->error('Session expired. Please register again.');
+            return redirect()->route('register');
+        }
+
+        // Generate new OTP
+        $otp = random_int(100000, 999999);
+        session([
+            'register_otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(5)->timestamp,
+            'otp_expired' => false
+        ]);
+
+        // Resend OTP email
+        Mail::to(session('register_data.email'))->send(new SendOtpMail($otp, session('register_data.name')));
+
+        flash()->success('A new OTP has been sent to your email.');
+        return back();
     }
 
     private function completeRegistration()
