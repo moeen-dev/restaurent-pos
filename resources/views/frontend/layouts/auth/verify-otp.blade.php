@@ -89,7 +89,7 @@
         let isExpired = {{ session('otp_expired') ? 'true' : 'false' }};
     </script>
 
-    <!-- ✅ Timer Script -->
+    <!--  Timer Script -->
     <script>
         const timer = document.getElementById("otpTimer");
         const resendBtn = document.getElementById("resendBtn");

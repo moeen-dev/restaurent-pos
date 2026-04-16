@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ResetPasswordMail;
 use App\Mail\SendOtpMail;
 use App\Models\Restaurant;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +20,13 @@ use function Flasher\Prime\flash;
 
 class AuthController extends Controller
 {
+    // Show registration form
     public function register()
     {
         return view('frontend.layouts.auth.register');
     }
 
+    // Handle registration form submission
     public function registerSubmit(Request $request)
     {
         // Handle registration logic here
@@ -67,6 +71,7 @@ class AuthController extends Controller
         return redirect()->route('register.otp');
     }
 
+    // Show OTP verification form
     public function showOtpForm()
     {
         // Optional: prevent direct access without session
@@ -77,6 +82,7 @@ class AuthController extends Controller
         return view('frontend.layouts.auth.verify-otp'); // create this view
     }
 
+    // Handle OTP verification
     public function verifyOtp(Request $request)
     {
         $request->validate(
@@ -116,6 +122,7 @@ class AuthController extends Controller
         return $this->completeRegistration();
     }
 
+    // Handle OTP resend
     public function resendOtp()
     {
         if (!session('register_data')) {
@@ -138,6 +145,7 @@ class AuthController extends Controller
         return back();
     }
 
+    // Complete registration after OTP verification
     private function completeRegistration()
     {
         $data = session('register_data');
@@ -185,24 +193,40 @@ class AuthController extends Controller
         }
     }
 
+    // 
     public function login()
     {
         return view('frontend.layouts.auth.login');
     }
 
+    // Handle login form submission
     public function loginSubmit(Request $request)
     {
         try {
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required'
-            ]);
+            $request->validate(
+                [
+                    'email' => 'required|email',
+                    'password' => 'required'
+                ],
+                [
+                    'email.required' => 'Email is required.',
+                    'email.email' => 'Please enter a valid email address.',
+                    'password.required' => 'Password is required.'
+                ]
+            );
 
-            if (!Auth::attempt($request->only('email', 'password'))) {
+            $credentials = $request->only('email', 'password');
+
+            $remeber = $request->has('remember');
+
+            if (!Auth::attempt($credentials, $remeber)) {
 
                 flash()->error('Invalid email or password.');
                 return back()->withInput();
             }
+
+            $request->session()->regenerate();
+
 
             $user = Auth::user();
             $restaurant = $user->restaurants()->first();
@@ -249,6 +273,85 @@ class AuthController extends Controller
         }
     }
 
+    // Show password reset request form
+    public function showPasswordResetForm()
+    {
+        return view('frontend.layouts.auth.password.reset');
+    }
+
+    // Handle sending password reset link
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        $token = Str::random(64);
+
+        // Store token
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => Carbon::now()
+            ]
+        );
+
+
+        $link = url('/password-reset/' . $token . '?email=' . urlencode($request->email));
+
+        // Send email (simple version)
+        Mail::to($request->email)->send(new ResetPasswordMail($link));
+
+        flash()->success('Reset link sent to your email.');
+        return back();
+    }
+
+    // Show password reset form
+    public function showResetForm(Request $request, $token)
+    {
+        return view('frontend.layouts.auth.password.new-pass', [
+            'token' => $token,
+            'email' => $request->email
+        ]);
+    }
+
+    // Handle password reset
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'token' => 'required',
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        // Get record only by email
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        // Check if record exists and token matches
+        if (!$record || !Hash::check($request->token, $record->token)) {
+            flash()->error('Invalid reset link.');
+            return back();
+        }
+
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            flash()->error('Invalid or expired token.');
+            return back();
+        }
+
+        User::where('email', $request->email)->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        flash()->success('Password reset successful. You can now log in.');
+        return redirect()->route('login');
+    }
+
+    // Handle logout
     public function logout(Request $request)
     {
         Auth::logout();

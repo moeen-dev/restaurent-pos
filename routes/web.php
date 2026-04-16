@@ -29,13 +29,19 @@ Route::post('/register', [FrontendAuthController::class, 'registerSubmit'])->nam
 Route::get('/register/verify-otp', [FrontendAuthController::class, 'showOtpForm'])->name('register.otp');
 Route::post('/register/verify-otp', [FrontendAuthController::class, 'verifyOtp'])->name('register.otp.verify');
 
-// 
+// OTP resend route
 Route::post('/resend/otp', [FrontendAuthController::class, 'resendOtp'])->name('register.otp.resend');
 
 // Login and logout routes
 Route::get('/login', [FrontendAuthController::class, 'login'])->name('login');
 Route::post('/login', [FrontendAuthController::class, 'loginSubmit'])->name('login.submit');
 Route::post('/logout', [FrontendAuthController::class, 'logout'])->name('logout');
+
+// Password Reset routes
+Route::get('/password-reset', [FrontendAuthController::class, 'showPasswordResetForm'])->name('password.request');
+Route::post('/password-reset', [FrontendAuthController::class, 'sendResetLink'])->name('password.email');
+Route::get('/password-reset/{token}', [FrontendAuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [FrontendAuthController::class, 'resetPassword'])->name('password.update');
 
 Route::group(['prefix' => 'restaurant'], function () {
     Route::get('/', function () {
