@@ -11,13 +11,15 @@ class ResetPasswordMail extends Mailable
     use Queueable, SerializesModels;
 
     public $link;
+    public $name;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($link)
+    public function __construct($link, $name)
     {
         $this->link = $link;
+        $this->name = $name;
     }
 
     /**
@@ -25,7 +27,7 @@ class ResetPasswordMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Reset Your Password')
+        return $this->subject('Reset Your Password for Restaurant POS')
             ->view('frontend.layouts.auth.password.reset-email');
     }
 }

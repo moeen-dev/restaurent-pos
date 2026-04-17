@@ -39,7 +39,7 @@ Route::post('/logout', [FrontendAuthController::class, 'logout'])->name('logout'
 
 // Password Reset routes
 Route::get('/password-reset', [FrontendAuthController::class, 'showPasswordResetForm'])->name('password.request');
-Route::post('/password-reset', [FrontendAuthController::class, 'sendResetLink'])->name('password.email');
+Route::post('/password-reset', [FrontendAuthController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:5,60'); // Limit to 5 requests per minute
 Route::get('/password-reset/{token}', [FrontendAuthController::class, 'showResetForm'])->name('password.reset');
 Route::post('/password/reset', [FrontendAuthController::class, 'resetPassword'])->name('password.update');
 

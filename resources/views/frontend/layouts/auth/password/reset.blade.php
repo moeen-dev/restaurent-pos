@@ -45,11 +45,18 @@
                             <path d="M22 6L12 13L2 6" stroke="#64748B" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="Enter your email">
+                        <input type="email" name="email" value="{{ old('email') }}" required
+                            placeholder="Enter your email">
 
                     </div>
                     @if($errors->has('email'))
                     <span class="required">{{ $errors->first('email') }}</span>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="required">
+                        {{ session('error') }}
+                    </div>
                     @endif
                 </div>
 

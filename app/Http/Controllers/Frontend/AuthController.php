@@ -286,6 +286,21 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email'
         ]);
 
+        $email = $request->email;
+
+        // Check limit (5 requests in 60 minutes)
+        $count = DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->where('created_at', '>=', now()->subMinutes(60))
+            ->count();
+
+        if ($count >= 5) {
+            flash()->error('You have exceeded the maximum number of password reset requests. Please try again later.');
+            return back();
+        }
+
+        $user = User::where('email', $request->email)->first();
+
         $token = Str::random(64);
 
         // Store token
@@ -301,7 +316,7 @@ class AuthController extends Controller
         $link = url('/password-reset/' . $token . '?email=' . urlencode($request->email));
 
         // Send email (simple version)
-        Mail::to($request->email)->send(new ResetPasswordMail($link));
+        Mail::to($request->email)->send(new ResetPasswordMail($link, $user->name));
 
         flash()->success('Reset link sent to your email.');
         return back();
@@ -336,7 +351,7 @@ class AuthController extends Controller
             return back();
         }
 
-        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+        if (Carbon::parse($record->created_at)->addMinutes(15)->isPast()) {
             flash()->error('Invalid or expired token.');
             return back();
         }
