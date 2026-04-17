@@ -88,7 +88,7 @@
                 margin-top: 60px;
                 font-size: 40px;
                 font-weight: 600;
-                letter-spacing: 25px;
+                letter-spacing: 5px;
                 color: #ba3d4f;
               ">
                         {{ $otp }}
