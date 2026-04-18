@@ -54,13 +54,14 @@
                     @endif
 
                     @if(session('error'))
-                    <div class="required">
+                    <div style="color: red; margin-bottom:10px;">
                         {{ session('error') }}
+                        <span id="countdown"></span>
                     </div>
                     @endif
                 </div>
 
-                <button type="submit" class="btn-submit">Send Reset Link</button>
+                <button id="submitBtn" type="submit" class="btn-submit">Send Reset Link</button>
             </form>
 
             <!-- Footer -->

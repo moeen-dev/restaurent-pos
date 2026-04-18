@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 use function Flasher\Prime\flash;
+use function Symfony\Component\Clock\now;
 
 class AuthController extends Controller
 {
@@ -61,7 +62,7 @@ class AuthController extends Controller
         session([
             'register_data' => $validatedData,
             'register_otp' => $otp,
-            'otp_expires_at' => now()->addMinutes(5)->timestamp // OTP valid for 5 minutes
+            'otp_expires_at' => Carbon::now()->addMinutes(5)->timestamp // OTP valid for 5 minutes
         ]);
 
         // Send OTP to user's email
@@ -101,7 +102,7 @@ class AuthController extends Controller
             return back();
         }
 
-        if (now()->timestamp > session('otp_expires_at')) {
+        if (Carbon::now()->timestamp > session('otp_expires_at')) {
 
             session([
                 'otp_expired' => true,
@@ -134,7 +135,7 @@ class AuthController extends Controller
         $otp = random_int(100000, 999999);
         session([
             'register_otp' => $otp,
-            'otp_expires_at' => now()->addMinutes(5)->timestamp,
+            'otp_expires_at' => Carbon::now()->addMinutes(5)->timestamp,
             'otp_expired' => false
         ]);
 
@@ -291,12 +292,22 @@ class AuthController extends Controller
         // Check limit (5 requests in 60 minutes)
         $count = DB::table('password_reset_tokens')
             ->where('email', $email)
-            ->where('created_at', '>=', now()->subMinutes(60))
+            ->where('created_at', '>=', Carbon::now()->subMinutes(60))
             ->count();
 
         if ($count >= 5) {
-            flash()->error('You have exceeded the maximum number of password reset requests. Please try again later.');
-            return back();
+
+            $oldest = DB::table('password_reset_tokens')
+                ->where('email', $email)
+                ->where('created_at', '>=', Carbon::now()->subMinutes(60))
+                ->orderBy('created_at', 'asc')
+                ->first();
+
+            $expiresAt = $oldest ? Carbon::parse($oldest->created_at)->addMinutes(60)->timestamp : Carbon::now()->addMinutes(60)->timestamp;
+
+            return redirect()->back()
+                ->with('error', 'Too many requests. Please try again later.')
+                ->with('expiresAt', $expiresAt);
         }
 
         $user = User::where('email', $request->email)->first();
